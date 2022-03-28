@@ -35,4 +35,17 @@ todoController.removeTodo = async function (req, res) {
   }
 };
 
+todoController.toggleCompleted = async function (req, res) {
+  let todo;
+  try {
+    todo = await Todo.updateOne(
+      { _id: req.body._id },
+      { $set: { completed: req.body.completed } }
+    );
+    res.send(todo);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
+
 module.exports = todoController;

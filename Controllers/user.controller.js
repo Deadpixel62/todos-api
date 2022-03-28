@@ -1,4 +1,4 @@
-const User = require("../Models/user.model.js");
+const User = require("../Models/user.model");
 const userController = {};
 const jwt = require("jsonwebtoken");
 const key = process.env.KEY;
@@ -23,6 +23,57 @@ userController.register = async (req, res) => {
     res.status(500).send(error);
   }
 };
+
+userController.getUser = (req, res) => {
+  let user;
+  try {
+    user = User.findOne({ _id: req.body.userId })
+      .populate("todo")
+      .then((user) => {
+        res.status(200).send(user);
+      });
+  } catch (error) {
+    res.status(500).json({
+      error: error,
+    });
+  }
+};
+
+userController.getAllUsers = async function (req, res) {
+  try {
+    const users = await User.find({}).populate("todo");
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({
+      error: error,
+    });
+  }
+};
+
+userController.getUserTodos = async function (req, res) {
+  try {
+    console.log("=====", req.body);
+    const user = await User.findOne({ _id: req.params.userId }).populate(
+      "todo"
+    );
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({
+      error: error,
+    });
+  }
+};
+
+// userController.getAllUsers = async function (req, res) {
+//   console.log("GET /users");
+//   let users;
+//   try {
+//     users = await User.find().populate("Todo");
+//     res.status(200).send(users);
+//   } catch (error) {
+//     res.status(500).send(error);
+//   }
+// };
 
 // userController.register = async (req, res) => {
 //   try {
@@ -76,5 +127,18 @@ userController.removeTodo = async function (req, res) {
     res.status(500).send(error);
   }
 };
+
+// userController.toggleTodo = async function (req, res) {
+//   let user;
+//   try {
+//     user = await User.updateOne(
+//       { _id: req.body.userId },
+//       { $set: { completed: req.body.completed } }
+//     );
+//     res.status(200).json(user);
+//   } catch (error) {
+//     res.status(500).send(error);
+//   }
+// };
 
 module.exports = userController;
